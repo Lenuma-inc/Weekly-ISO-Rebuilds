@@ -55,7 +55,7 @@ jobs:
 
       - name: Build LunaOS ISO
         run: |
-          cd /__w/LunaOS-ISO
+          cd /__w/Weekly-ISO-Rebuilds
           git clone https://github.com/Lenuma-inc/LunaOS-ISO.git
           cd /__w/Weekly-ISO-Rebuilds/LunaOS-ISO
           sudo mkarchiso -v -w . -o build .
