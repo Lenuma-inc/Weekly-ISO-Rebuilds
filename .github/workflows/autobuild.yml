@@ -28,6 +28,8 @@ jobs:
           
       - name: Prepare container
         run: |
+          pacman -Scc --noconfirm
+          pacman -Syy
           pacman -Syuu --noconfirm --needed archiso mkinitcpio-archiso git squashfs-tools wget curl lftp networkmanager xz zstd
 
           # Chaotic-AUR repository keys
