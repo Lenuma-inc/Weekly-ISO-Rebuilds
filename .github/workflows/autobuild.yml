@@ -74,6 +74,8 @@ jobs:
           cd /__w/Weekly-ISO-Rebuilds
           git clone https://github.com/Lenuma-inc/LunaOS-ISO.git
           cd /__w/Weekly-ISO-Rebuilds/LunaOS-ISO
+          sudo pacman -Scc --noconfirm
+          sudo pacman -Syy
           sudo mkarchiso -v -w . -o build .
 
       - name: Checkout
