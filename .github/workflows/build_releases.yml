@@ -1,0 +1,86 @@
+name: Building LunaOS ISO (Releases)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    permissions:
+      contents: write
+
+    container:
+      image: archlinux:base-devel
+      options: --privileged
+
+    env:
+        GPG_PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+    steps:
+
+      - name: Set current date as env variable
+        run: |
+          echo "NOW=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+          
+      - name: Prepare container
+        run: |
+          pacman -Scc --noconfirm
+          pacman -Syy
+          pacman -Syuu --noconfirm --needed archiso mkinitcpio-archiso git squashfs-tools wget curl lftp networkmanager xz zstd
+
+          # Chaotic-AUR repository keys
+          pacman-key --init
+          pacman-key --recv-key 3056513887B78AEB 78B2BAAB82C8D511 --keyserver keyserver.ubuntu.com
+          pacman-key --lsign-key 3056513887B78AEB 78B2BAAB82C8D511
+          pacman -U --noconfirm 'https://github.com/lenuma-inc/lunaos-repo/releases/download/lunaos-repo/lunaos-keyring-4-1-any.pkg.tar.zst' 'https://github.com/lenuma-inc/lunaos-repo/releases/download/lunaos-repo/lunaos-mirrorlist-2-3-x86_64.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+          
+          # Enable the multilib repository
+          cat << EOM >> /etc/pacman.conf
+          [multilib]
+          Include = /etc/pacman.d/mirrorlist
+
+          [lunaos-repo]
+          Include = /etc/pacman.d/lunaos-mirrorlist
+          SigLevel = Never
+
+          [chaotic-aur]
+          Include = /etc/pacman.d/chaotic-mirrorlist
+          SigLevel = Never
+          EOM
+
+          pacman -Sy --noconfirm rate-mirrors
+
+          rate-mirrors --allow-root arch | tee /etc/pacman.d/mirrorlist
+          rate-mirrors --allow-root chaotic-aur | tee /etc/pacman.d/chaotic-mirrorlist
+
+          pacman -Sy
+
+          useradd -m -G wheel -s /bin/bash user && echo "user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          chown user:user -R ..
+
+      - name: Import GPG private key
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          trust_level: 5
+
+      - name: Build LunaOS ISO
+        run: |
+          cd /__w/Weekly-ISO-Rebuilds
+          git clone https://github.com/Lenuma-inc/LunaOS-ISO.git
+          cd /__w/Weekly-ISO-Rebuilds/LunaOS-ISO
+          sudo pacman -Scc --noconfirm
+          sudo pacman -Syy
+          sudo mkarchiso -v -w . -o build .
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Release ISO to Github Releases
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.NOW }}
+          files: /__w/Weekly-ISO-Rebuilds/LunaOS-ISO/build/*

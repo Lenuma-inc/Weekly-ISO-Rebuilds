@@ -1,4 +1,4 @@
-name: Automatically building LunaOS ISO
+name: Automaticly building LunaOS ISO (Pre Release)
 
 on:
   schedule:
@@ -85,4 +85,5 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.NOW }}
+          prerelease: true
           files: /__w/Weekly-ISO-Rebuilds/LunaOS-ISO/build/*
