@@ -83,4 +83,5 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.NOW }}
+          prerelease: false
           files: /__w/Weekly-ISO-Rebuilds/LunaOS-ISO/build/*
