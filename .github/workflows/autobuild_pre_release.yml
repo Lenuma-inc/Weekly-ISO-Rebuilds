@@ -41,6 +41,8 @@ jobs:
 
           pacman -U --disable-download-timeout --noconfirm 'https://github.com/lenuma-inc/lunaos-repo/releases/download/lunaos-repo/lunaos-keyring-4-1-any.pkg.tar.zst'
           pacman -U --disable-download-timeout --noconfirm 'https://github.com/lenuma-inc/lunaos-repo/releases/download/lunaos-repo/lunaos-mirrorlist-2-3-x86_64.pkg.tar.zst'
+
+          pacman -S --disable-download-timeout --noconfirm archlinux-keyring
           
           # Enable the multilib repository
           cat << EOM >> /etc/pacman.conf
