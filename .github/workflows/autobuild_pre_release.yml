@@ -38,8 +38,7 @@ jobs:
           pacman -U --disable-download-timeout --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst'
           pacman -U --disable-download-timeout --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
 
-
-          pacman -U --disable-download-timeout --noconfirm 'https://github.com/lenuma-inc/lunaos-repo/releases/download/lunaos-repo/lunaos-keyring-4-1-any.pkg.tar.zst'
+          pacman -U --disable-download-timeout --noconfirm 'https://github.com/lenuma-inc/lunaos-repo/releases/download/lunaos-repo/lunaos-keyring-1-1-any.pkg.tar.zst'
           pacman -U --disable-download-timeout --noconfirm 'https://github.com/lenuma-inc/lunaos-repo/releases/download/lunaos-repo/lunaos-mirrorlist-2-3-x86_64.pkg.tar.zst'
           
           # Enable the multilib repository
