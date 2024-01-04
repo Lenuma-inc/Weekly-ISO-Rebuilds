@@ -38,6 +38,7 @@ jobs:
 
           pacman -U --disable-download-timeout --noconfirm 'https://github.com/lenuma-inc/lunaos-repo/releases/download/lunaos-repo/lunaos-keyring-1-1-any.pkg.tar.zst'
           pacman -U --disable-download-timeout --noconfirm 'https://github.com/lenuma-inc/lunaos-repo/releases/download/lunaos-repo/lunaos-mirrorlist-2-3-x86_64.pkg.tar.zst'
+          pacman-key --populate
 
           # Enable the multilib repository
           cat << EOM >> /etc/pacman.conf
@@ -58,11 +59,14 @@ jobs:
           rate-mirrors --allow-root arch | tee /etc/pacman.d/mirrorlist
           rate-mirrors --allow-root chaotic-aur | tee /etc/pacman.d/chaotic-mirrorlist
 
-          pacman -Syy
+          rm /var/cache/pacman/pkg/*
+          rm /var/lib/pacman/sync/*
+
+          pacman -Syyuu
 
           useradd -m -G wheel -s /bin/bash user && echo "user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
           chown user:user -R ..
-#
+
       - name: Import GPG private key
         uses: crazy-max/ghaction-import-gpg@v5
         with:
