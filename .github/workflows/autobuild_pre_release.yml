@@ -90,6 +90,9 @@ jobs:
       - name: Release ISO to Github Releases
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ env.NOW }}
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "${{ env.NOW }}"
           prerelease: true
+          title: "Weekly test prerelease Rebuild ${{ env.NOW }}"
           files: /__w/Weekly-ISO-Rebuilds/LunaOS-ISO/build/*
+          id: "weekly-iso-rebuild-prelease"
