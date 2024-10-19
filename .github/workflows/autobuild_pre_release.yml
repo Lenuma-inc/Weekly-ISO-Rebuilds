@@ -28,18 +28,19 @@ jobs:
           
       - name: Prepare container
         run: |
-          pacman -Syuu --noconfirm --needed archiso xz zstd
+          pacman -Syuu --noconfirm --needed archiso xz zstd git
 
           # Chaotic-AUR repository keys
+          yes | pacman -Scc
           pacman-key --init
-          pacman-key --recv-key 349BC7808577C592 78B2BAAB82C8D511 --keyserver keyserver.ubuntu.com
-          pacman-key --lsign-key 349BC7808577C592 78B2BAAB82C8D511
+          pacman-key --recv-key 3056513887B78AEB 78B2BAAB82C8D511 --keyserver keyserver.ubuntu.com
+          pacman-key --lsign-key 3056513887B78AEB 78B2BAAB82C8D511
 
-          pacman -U --disable-download-timeout --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst'
-          pacman -U --disable-download-timeout --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
-
-          pacman -U --disable-download-timeout --noconfirm 'https://github.com/lenuma-inc/lunaos-repo/releases/download/lunaos-repo/lunaos-keyring-1-1-any.pkg.tar.zst'
-          pacman -U --disable-download-timeout --noconfirm 'https://github.com/lenuma-inc/lunaos-repo/releases/download/lunaos-repo/lunaos-mirrorlist-2-3-x86_64.pkg.tar.zst'
+          pacman -U --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst'
+          pacman -U --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+          
+          pacman -U --noconfirm 'https://github.com/lenuma-inc/lunaos-repo/releases/download/lunaos-repo/lunaos-keyring-1-1-any.pkg.tar.zst'
+          pacman -U --noconfirm 'https://github.com/lenuma-inc/lunaos-repo/releases/download/lunaos-repo/lunaos-mirrorlist-2-3-x86_64.pkg.tar.zst'
           pacman-key --populate
           
           # Enable the multilib repository
@@ -61,9 +62,8 @@ jobs:
           rate-mirrors --allow-root arch | tee /etc/pacman.d/mirrorlist
           rate-mirrors --allow-root chaotic-aur | tee /etc/pacman.d/chaotic-mirrorlist
 
-          rm /var/cache/pacman/pkg/*
-          rm /var/lib/pacman/sync/*
-
+          yes | pacman -Scc
+          
           pacman -Syyuu
 
           useradd -m -G wheel -s /bin/bash user && echo "user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
