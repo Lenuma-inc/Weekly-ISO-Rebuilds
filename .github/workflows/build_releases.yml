@@ -20,10 +20,6 @@ jobs:
 
     steps:
 
-      - name: Set current date as env variable
-        run: |
-          echo "NOW=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-          
       - name: Prepare container
         run: |
           pacman -Syuu --noconfirm --needed archiso xz zstd git
@@ -85,12 +81,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Release ISO to Github Releases
-        uses: marvinpinto/action-automatic-releases@latest
+      - name: Release ISO to FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ env.NOW }}"
-          prerelease: false
-          title: "New Release ${{ env.NOW }}"
-          files: /__w/Weekly-ISO-Rebuilds/LunaOS-ISO/build/*
-          id: "weekly-iso-rebuild"
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: /__w/Weekly-ISO-Rebuilds/LunaOS-ISO/build/
+          server-dir: ${{ secrets.FTP_SERVER }}/public_html/ISO/
