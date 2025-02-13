@@ -16,13 +16,21 @@ jobs:
       options: --privileged
 
     env:
-        GPG_PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      GPG_PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
     steps:
 
+      - name: Import GPG private key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ env.GPG_PRIVATE_KEY }}
+          passphrase: ${{ env.GPG_PASSPHRASE }}
+          trust_level: 5
+
       - name: Prepare container
         run: |
-          pacman -Syuu --noconfirm --needed archiso xz zstd git
+          pacman -Syuu --noconfirm --needed archiso xz zstd git gnupg zip
           
           # Chaotic-AUR and yours repository keys
           yes | pacman -Scc
@@ -63,13 +71,6 @@ jobs:
           useradd -m -G wheel -s /bin/bash user && echo "user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
           chown user:user -R ..
 
-      - name: Import GPG private key
-        uses: crazy-max/ghaction-import-gpg@v5
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          trust_level: 5
-
       - name: Build LunaOS ISO
         run: |
           cd /__w/Weekly-ISO-Rebuilds
@@ -77,6 +78,15 @@ jobs:
           cd /__w/Weekly-ISO-Rebuilds/LunaOS-ISO
           sudo pacman -Sy
           sudo mkarchiso -v -w . -o build .
+
+      - name: Generate checksum and sign ISO
+        run: |
+          cd /__w/Weekly-ISO-Rebuilds/LunaOS-ISO/build/
+          sha256sum *.iso > SHA256SUMS
+          gpg --pinentry-mode loopback --batch --yes --passphrase "$GPG_PASSPHRASE" --detach-sign --armor SHA256SUMS
+          gpg --pinentry-mode loopback --batch --yes --passphrase "$GPG_PASSPHRASE" --detach-sign --armor *.iso
+          zip latest.zip *.iso *.iso.asc SHA256SUMS SHA256SUMS.asc
+          rm -f *.iso *.iso.asc SHA256SUMS.asc
 
       - name: Checkout
         uses: actions/checkout@v3
