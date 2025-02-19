@@ -85,8 +85,6 @@ jobs:
           sha256sum *.iso > SHA256SUMS
           gpg --pinentry-mode loopback --batch --yes --passphrase "$GPG_PASSPHRASE" --detach-sign --armor SHA256SUMS
           gpg --pinentry-mode loopback --batch --yes --passphrase "$GPG_PASSPHRASE" --detach-sign --armor *.iso
-          zip latest.zip *.iso *.iso.asc SHA256SUMS SHA256SUMS.asc
-          rm -f *.iso *.iso.asc SHA256SUMS.asc
 
       - name: Checkout
         uses: actions/checkout@v3
