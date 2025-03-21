@@ -66,7 +66,7 @@ jobs:
 
           yes | pacman -Scc
 
-          pacman -Syyuu
+          pacman -Syyuu --noconfirm
 
           useradd -m -G wheel -s /bin/bash user && echo "user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
           chown user:user -R ..
