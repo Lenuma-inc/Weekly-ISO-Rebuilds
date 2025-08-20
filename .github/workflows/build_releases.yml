@@ -59,11 +59,6 @@ jobs:
           SigLevel = Never
           EOM
 
-          pacman -Sy --noconfirm rate-mirrors
-
-          rate-mirrors --allow-root arch | tee /etc/pacman.d/mirrorlist
-          rate-mirrors --allow-root chaotic-aur | tee /etc/pacman.d/chaotic-mirrorlist
-
           yes | pacman -Scc
 
           pacman -Syyuu --noconfirm
