@@ -74,18 +74,18 @@ jobs:
           sudo pacman -Sy
           sudo mkarchiso -v -w . -o build .
 
-      - name: Generate checksum and sign ISO
-        run: |
-          cd /__w/Weekly-ISO-Rebuilds/LunaOS-ISO/build/
-          sha256sum *.iso > lunaos-latest-x86_64.iso.sha256sum
-          gpg --pinentry-mode loopback --batch --yes --passphrase "$GPG_PASSPHRASE" --detach-sign --armor *.sha256sum
-          gpg --pinentry-mode loopback --batch --yes --passphrase "$GPG_PASSPHRASE" --detach-sign --armor *.iso
-
       - name: Create latest symlink
         run: |
           cd /__w/Weekly-ISO-Rebuilds/LunaOS-ISO/build/
           ISO_FILE=$(ls *.iso | head -1)
           ln -sf "$ISO_FILE" lunaos-latest-x86_64.iso
+
+      - name: Generate checksum and sign ISO
+        run: |
+          cd /__w/Weekly-ISO-Rebuilds/LunaOS-ISO/build/
+          sha256sum lunaos-latest-x86_64.iso > lunaos-latest-x86_64.iso.sha256sum
+          gpg --pinentry-mode loopback --batch --yes --passphrase "$GPG_PASSPHRASE" --detach-sign --armor lunaos-latest-x86_64.iso.sha256sum
+          gpg --pinentry-mode loopback --batch --yes --passphrase "$GPG_PASSPHRASE" --detach-sign --armor lunaos-latest-x86_64.iso
 
       - name: Checkout
         uses: actions/checkout@v3
